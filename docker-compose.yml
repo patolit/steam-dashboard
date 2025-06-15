@@ -26,6 +26,10 @@ services:
     environment:
       - DATABASE_URL=postgres://steam:steam@db:5432/steamstats
       - PORT=3001
+      - NODE_ENV=development
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
     depends_on:
       db:
         condition: service_healthy 

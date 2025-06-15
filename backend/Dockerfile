@@ -10,4 +10,5 @@ COPY . .
 
 EXPOSE 3001
 
-CMD ["node", "index.js"] 
+# Use nodemon for development
+CMD ["npm", "run", "dev"] 
