@@ -24,18 +24,18 @@ function generatePlayerCount(baseCount, timestamp) {
   return Math.floor(baseCount * randomFactor * timeFactor);
 }
 
-// Generate mock data for all games
 async function generateMockData() {
   try {
-    console.log('Generating mock data...');
-    const timestamp = new Date();
-    
-    for (const game of sampleGames) {
-      // Base player count varies by game
-      const baseCount = Math.floor(Math.random() * 100000) + 1000;
-      const currentPlayers = generatePlayerCount(baseCount, timestamp);
+    console.log('Generating 24h mock data...');
+    const now = new Date();
+    const intervalMinutes = 30; // Create data points every 30 minutes
+    const intervals = 24 * 60 / intervalMinutes;
 
-      // Update or insert game metadata
+    for (const game of sampleGames) {
+      // Base count per game
+      const baseCount = Math.floor(Math.random() * 100000) + 1000;
+
+      // Insert or update game metadata
       await db.query(
         `INSERT INTO games (id, name, genre) 
          VALUES ($1, $2, $3)
@@ -44,17 +44,21 @@ async function generateMockData() {
         [game.id, game.name, game.genre]
       );
 
-      // Insert player stats
-      await db.query(
-        `INSERT INTO player_stats (game_id, players, timestamp)
-         VALUES ($1, $2, $3)`,
-        [game.id, currentPlayers, timestamp]
-      );
+      for (let i = intervals; i >= 0; i--) {
+        const timestamp = new Date(now.getTime() - i * intervalMinutes * 60 * 1000);
+        const players = generatePlayerCount(baseCount, timestamp);
 
-      console.log(`Updated ${game.name} with ${currentPlayers} players`);
+        await db.query(
+          `INSERT INTO player_stats (game_id, players, timestamp)
+           VALUES ($1, $2, $3)`,
+          [game.id, players, timestamp]
+        );
+      }
+
+      console.log(`Seeded data for ${game.name}`);
     }
 
-    console.log('Mock data generation completed');
+    console.log('Mock 24h data generation completed.');
     return sampleGames;
   } catch (error) {
     console.error('Error generating mock data:', error);

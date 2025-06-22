@@ -1,6 +1,8 @@
+const cors = require('cors');
 const express = require('express');
 const { Pool } = require('pg');
 require('dotenv').config();
+
 
 const gamesRouter = require('./routes/games');
 const statsRouter = require('./routes/stats');
@@ -9,6 +11,8 @@ const updateRouter = require('./routes/update');
 
 const app = express();
 const port = process.env.PORT || 3001;
+
+app.use(cors({ origin: 'http://localhost:5173' }));
 
 // Middleware
 app.use(express.json());

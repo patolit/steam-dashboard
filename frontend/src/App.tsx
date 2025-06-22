@@ -1,35 +1,42 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from 'react';
+import { Container, Typography, Card, CardContent, Grid, CssBaseline } from '@mui/material';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [games, setGames] = useState([]);
+
+  useEffect(() => {
+    fetch('http://localhost:3001/games')
+      .then((res) => {
+        if (!res.ok) throw new Error('Failed to fetch');
+        return res.json();
+      })
+      .then((data) => setGames(data))
+      .catch((err) => console.error(err));
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <CssBaseline />
+      <Container maxWidth="md" sx={{ mt: 4 }}>
+        <Typography variant="h4" align="center" gutterBottom>
+          🎮 Steam Game Stats Dashboard
+        </Typography>
+
+        <Grid container spacing={2}>
+          {games.map((game: any) => (
+            <Grid xs={12} sm={6} md={4} key={game.id}>
+              <Card>
+                <CardContent>
+                  <Typography variant="h6">{game.name}</Typography>
+                  <Typography variant="body2">App ID: {game.id}</Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
